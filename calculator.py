@@ -5,7 +5,7 @@ YELLOW = "\033[33m"
 RESET = "\033[0m"
 
 def clear_bash():
-    os.system("clear")
+    os.system("cls" if os.name == "nt" else "clear")
 
 def get_numbers():
     while True:
