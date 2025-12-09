@@ -1,7 +1,7 @@
 import os
+from calculator.math_core import check_choice
 
 RED = "\033[31m"
-YELLOW = "\033[33m"
 RESET = "\033[0m"
 
 def clear_bash():
@@ -59,50 +59,11 @@ def continue_or_exit():
         clear_bash()
         print(RED + "!!! I AM NOT LEAVING THIS FUNCTION UNTIL I GET A CLEAR RESPONSE AS IN \"Y\" or \"N\" !!!" + RESET)
 
-def check_choice(choice, x, y):
-    match choice:
-        # ADD
-        case 1:
-            print("---------------------")
-            print(f"{x} + {y} = {x + y}")
-            print("---------------------")
-        
-        # SUB
-        case 2:
-            print("---------------------")
-            print(f"{x} - {y} = {x - y}")
-            print("---------------------")
 
-        # MULTIPLY
-        case 3:
-            print("---------------------")
-            print(f"{x} * {y} = {x * y}")
-            print("---------------------")
-
-        # DIVIDE
-        case 4:
-            print("---------------------")
-
-            if not y:
-                if x < 0:
-                    print(f"{x} / {y} = -♾️")
-                elif not x:
-                    print(f"{x} / {y} = " + YELLOW + "UNDEFINED" + RESET)
-                else:
-                    print(f"{x} / {y} = ♾️")
-
-            else:
-                print(f"{x} / {y} = {x / y}")
-
-            print("---------------------")
-
-
-def main():
+def run():
     while True:
         x, y = get_numbers()
         check_choice(check_ans(), x, y)
         if not continue_or_exit():
             return
-
-main()
 
