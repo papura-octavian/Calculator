@@ -1,3 +1,4 @@
+from fractions import Fraction
 import os
 from calculator.math_core import check_choice
 
@@ -11,8 +12,8 @@ def get_numbers():
     while True:
         clear_bash()
         try:
-            a = float(input("First number = "))
-            b = float(input("Second number = "))
+            a = float(Fraction(input("First number = ")))
+            b = float(Fraction(input("Second number = ")))
 
             return a, b       
         except Exception as err:
@@ -59,11 +60,30 @@ def continue_or_exit():
         clear_bash()
         print(RED + "!!! I AM NOT LEAVING THIS FUNCTION UNTIL I GET A CLEAR RESPONSE AS IN \"Y\" or \"N\" !!!" + RESET)
 
+def check_operation_type(choice):
+    match choice:
+        case 1:
+            return "+"
+        case 2:
+            return "-"
+        case 3:
+            return "*"
+        case 4:
+            return "/"
+
+def show_result(operation, x, y, result):
+    print("------------------")
+    print(f"{x} {operation} {y} = {result}")
+    print("------------------")
 
 def run():
     while True:
         x, y = get_numbers()
-        check_choice(check_ans(), x, y)
+        op_number = check_ans()
+        op_type = check_operation_type(op_number)
+
+        show_result(op_type, x, y, check_choice(op_number, x, y))
+
         if not continue_or_exit():
             return
 

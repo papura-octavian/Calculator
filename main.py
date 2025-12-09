@@ -1,3 +1,3 @@
-from calculator import console_ui
+from calculator import cli
 
-console_ui.run()
+cli.run()

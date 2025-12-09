@@ -1,39 +1,26 @@
-YELLOW = "\033[33m"
-RESET = "\033[0m"
-
 def check_choice(choice, x, y):
     match choice:
         # ADD
         case 1:
-            print("---------------------")
-            print(f"{x} + {y} = {x + y}")
-            print("---------------------")
+            return x + y
         
         # SUB
         case 2:
-            print("---------------------")
-            print(f"{x} - {y} = {x - y}")
-            print("---------------------")
+            return x - y
 
         # MULTIPLY
         case 3:
-            print("---------------------")
-            print(f"{x} * {y} = {x * y}")
-            print("---------------------")
+            return x * y
 
         # DIVIDE
         case 4:
-            print("---------------------")
-
             if not y:
                 if x < 0:
-                    print(f"{x} / {y} = -♾️")
+                    return "-♾️"
                 elif not x:
-                    print(f"{x} / {y} = " + YELLOW + "UNDEFINED" + RESET)
+                    return "UNDEFINED"
                 else:
-                    print(f"{x} / {y} = ♾️")
+                    return "♾️"
 
             else:
-                print(f"{x} / {y} = {x / y}")
-
-            print("---------------------")
+                return x / y
