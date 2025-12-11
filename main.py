@@ -1,3 +1,6 @@
 from calculator import cli
 
-cli.run()
+# TODO:
+
+if __name__ == "__main__":
+    cli.run()

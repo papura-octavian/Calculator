@@ -1,26 +1,31 @@
-def check_choice(choice, x, y):
-    match choice:
-        # ADD
-        case 1:
-            return x + y
-        
-        # SUB
-        case 2:
-            return x - y
+class Algebra:
+    def __init__(self, number_1: float, number_2: float) -> None:
+        self.number_1 = number_1
+        self.number_2 = number_2
 
-        # MULTIPLY
-        case 3:
-            return x * y
+    def check_choice(self, choice: int) -> float | str: 
+        match choice:
+            # ADD
+            case 1:
+                return self.number_1 + self.number_2
+            
+            # SUB
+            case 2:
+                return self.number_1 +-self.number_2
 
-        # DIVIDE
-        case 4:
-            if not y:
-                if x < 0:
-                    return "-♾️"
-                elif not x:
-                    return "UNDEFINED"
+            # MULTIPLY
+            case 3:
+                return self.number_1 * self.number_2
+
+            # DIVIDE
+            case 4:
+                if not self.number_2:
+                    if self.number_1 < 0:
+                        return "-♾️"
+                    elif not self.number_1:
+                        return "UNDEFINED"
+                    else:
+                        return "♾️"
+
                 else:
-                    return "♾️"
-
-            else:
-                return x / y
+                    return self.number_1 / self.number_2

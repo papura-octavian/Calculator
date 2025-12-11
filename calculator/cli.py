@@ -1,55 +1,189 @@
 from fractions import Fraction
 import os
-from calculator.math_core import check_choice
+from calculator.math_core import Algebra
+from calculator import geometry_core
 
 RED = "\033[31m"
 RESET = "\033[0m"
+PINK = "\033[95m"   # light magenta
 
-def clear_bash():
+#   ----------- Bash options ----------------------
+
+def clear_bash() -> None:
     os.system("cls" if os.name == "nt" else "clear")
 
-def get_numbers():
+
+#   ------------- Algebra -------------------------
+
+def get_numbers() -> Algebra:
     while True:
         clear_bash()
         try:
             a = float(Fraction(input("First number = ")))
             b = float(Fraction(input("Second number = ")))
 
-            return a, b       
+            return Algebra(a, b)       
         except Exception as err:
             print(RED + "!!! PLEASE ENTER NUMBERS !!!" + RESET)
             print(f"Error type : {err}")
-            input("\nPress a Enter to continue...")
+            input("\nPress Enter to continue...")
 
-def show_menu():
-    clear_bash()
-    print("========================")
-    print("[1] - ADD")
-    print("[2] - SUB")
-    print("[3] - MULTIPLY")
-    print("[4] - DIVIDE")
-    print("========================")
+def menu_algebra() -> int:
+        clear_bash()
+        print("========================")
+        print("[1] - ADD")
+        print("[2] - SUB")
+        print("[3] - MULTIPLY")
+        print("[4] - DIVIDE")
+        print("========================")
 
-def check_ans():   
-    while True:
-        show_menu() 
+        return check_ans(4)   
+    
+def show_menu_algebra() -> int:
+        clear_bash()
+        print("========================")
+        print("[1] - Basic Operations")
+        print("========================")
+
+        return check_ans(1)
+
+def check_operation_type(choice: int) -> str:
+        match choice:
+            case 1:
+                return "+"
+            case 2:
+                return "-"
+            case 3:
+                return "*"
+            case 4:
+                return "/"
+
+def show_result(operation: str, x: float, y: float, result: float) -> None:
+        print("------------------")
+        print(f"{x} {operation} {y} = {result}")
+        print("------------------")
+
+
+# ---------------- Geometry --------------------------
+
+def check_ans_shape(choice: int) -> geometry_core.Triangle:
+        match choice:
+            # triangle
+            case 1:
+                while True:
+                    clear_bash()
+                    try:
+                        a = float(Fraction(input("First side = ")))
+                        b = float(Fraction(input("Second side = ")))
+                        c = float(Fraction(input("Third side = ")))
+
+                        if a + b <= c or a + c <= b or b + c <= a:
+                            print(RED + "Laturile nu formeaza un triunghi valid" + RESET)
+                            input("\nPress Enter to continue...")
+                            continue
+
+                        return geometry_core.Triangle(a, b, c)
+                    except Exception as err:
+                        print(RED + "!!! PLEASE ENTER NUMBERS !!!" + RESET)
+                        print(f"Error type : {err}")
+                        input("\nPress Enter to continue...")
+
+def show_menu_geometry():
+        clear_bash()
+        print("========================")
+        print("[1] - Triangle")
+        print("========================")
+
+        return check_ans_shape(check_ans(1))
+
+def menu_geometry(shape) -> None:
+        clear_bash()
+        match shape:
+            # ============ TRIUNGHI =====================
+            case geometry_core.Triangle() as triangle:
+
+                while True:
+                    clear_bash()
+                    print("========================")
+                    print("[1] - Perimeter")
+                    print("[2] - Check if it's a right triangle")
+                    print("[3] - Calculate height")
+                    print("[4] - Area")
+                    print("========================")
+
+                    match check_ans(4):
+                        case 1:
+                            print(f"The perimeter of the triangle is: {triangle.perimeter()}")
+                        case 2:
+                            if triangle.check_right_triangle():
+                                print("The triangle is right-angled!")
+                            else:
+                                print("The triangle is not right-angled!")
+
+                        case 3:
+                            print(f"\nCoresponding base:\n[1] - AB = {triangle.side1}\n[2] - BC = {triangle.side2}\n[3] - AC = {triangle.side3}")
+                            match check_ans(3):
+                                case 1:
+                                    print(f"The height for base = {triangle.side1} is {triangle.calc_height(triangle.side1)}")
+                                case 2:
+                                    print(f"The height for base = {triangle.side2} is {triangle.calc_height(triangle.side2)}")
+                                case 3:
+                                    print(f"The height for base = {triangle.side3} is {triangle.calc_height(triangle.side3)}")
+                        case 4:
+                            print(f"The area of the triangle is: {triangle.area()}")
+
+                    if not continue_or_exit():
+                        return
+        
+# ============== UI Funcions ====================
+
+def show_menu() -> bool:
+        clear_bash()
+        print("========================")
+        print("[1] - Algebra")
+        print("[2] - Geometry")
+        print("[3] - Exit")
+        print("========================")
+
+        match check_ans(3):
+            case 1:
+                match show_menu_algebra():
+                    case 1:
+                        algebra = get_numbers()
+                        while True:
+                            calculus_sign = menu_algebra()
+                            show_result(check_operation_type(calculus_sign), algebra.number_1, algebra.number_2, algebra.check_choice(calculus_sign))
+
+                            if not continue_or_exit():
+                                return False
+            case 2:
+                shape = show_menu_geometry()
+                menu_geometry(shape)
+            
+            # Exit Program
+            case 3:
+                return True
+
+def check_ans(no_chocices) -> int:   
+    while True: 
         try:
             answer = int(input("\nAnswer : "))
-            if answer >= 1 and answer <= 4:
+            if answer >= 1 and answer <= no_chocices:
                 return answer
             else:
-                print(RED + "!!! CHOOSE FROM THE NUMBERS DISPLAYED (1, 2, 3, 4) !!!" + RESET)
-                input("\nPress a Enter to continue...")
+                options = ", ".join(str(i) for i in range(1, no_chocices + 1))
+                print(RED + f"!!! CHOOSE FROM THE NUMBERS DISPLAYED" + PINK + options + RESET + "!!!")
+                input("\nPress Enter to continue...")
         except Exception as err:
             print(RED + "!!! PLEASE ONLY NATURAL NUMBERS !!!" + RESET)
             print(f"Error type : {err}")
-            input("\nPress a Enter to continue...")
+            input("\nPress Enter to continue...")
 
 
 
-def continue_or_exit():
+def continue_or_exit() -> bool:
     while True:
-        answer = input("Continue...[Y / N]: ").lower()
+        answer = input("\nContinue? [Y / N]: ").lower()
 
         if answer == "n":
             return False
@@ -60,30 +194,8 @@ def continue_or_exit():
         clear_bash()
         print(RED + "!!! I AM NOT LEAVING THIS FUNCTION UNTIL I GET A CLEAR RESPONSE AS IN \"Y\" or \"N\" !!!" + RESET)
 
-def check_operation_type(choice):
-    match choice:
-        case 1:
-            return "+"
-        case 2:
-            return "-"
-        case 3:
-            return "*"
-        case 4:
-            return "/"
-
-def show_result(operation, x, y, result):
-    print("------------------")
-    print(f"{x} {operation} {y} = {result}")
-    print("------------------")
-
-def run():
+def run() -> None:
     while True:
-        x, y = get_numbers()
-        op_number = check_ans()
-        op_type = check_operation_type(op_number)
-
-        show_result(op_type, x, y, check_choice(op_number, x, y))
-
-        if not continue_or_exit():
+        if show_menu():
             return
 
