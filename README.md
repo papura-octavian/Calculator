@@ -8,7 +8,6 @@ It:
 - multiplies
 - divides
 - makes geometry stuff now
-- mabye i will add a GUI idk 
 - `¯\_(ツ)_/¯`
 
 It does exactly what you expect. 
