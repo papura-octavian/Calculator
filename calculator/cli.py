@@ -5,7 +5,7 @@ from calculator import geometry_core
 
 RED = "\033[31m"
 RESET = "\033[0m"
-PINK = "\033[95m"   # light magenta
+PINK = "\033[38;5;205m"  
 
 #   ----------- Bash options ----------------------
 
@@ -172,7 +172,7 @@ def check_ans(no_chocices) -> int:
                 return answer
             else:
                 options = ", ".join(str(i) for i in range(1, no_chocices + 1))
-                print(RED + f"!!! CHOOSE FROM THE NUMBERS DISPLAYED" + PINK + options + RESET + "!!!")
+                print(RED + f"!!! CHOOSE FROM THE NUMBERS DISPLAYED " + PINK + f"({options})" + RED + " !!!" + RESET)
                 input("\nPress Enter to continue...")
         except Exception as err:
             print(RED + "!!! PLEASE ONLY NATURAL NUMBERS !!!" + RESET)
