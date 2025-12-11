@@ -78,7 +78,7 @@ def check_ans_shape(choice: int) -> geometry_core.Triangle:
                         c = float(Fraction(input("Third side = ")))
 
                         if a + b <= c or a + c <= b or b + c <= a:
-                            print(RED + "Laturile nu formeaza un triunghi valid" + RESET)
+                            print(RED + "The sides do not form a valid triangle" + RESET)
                             input("\nPress Enter to continue...")
                             continue
 
