@@ -3,7 +3,7 @@ class Algebra:
         self.number_1 = number_1
         self.number_2 = number_2
 
-    def check_choice(self, choice: int) -> float | str: 
+    def basic_operations(self, choice: int) -> float | str: 
         match choice:
             # ADD
             case 1:

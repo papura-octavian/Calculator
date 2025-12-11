@@ -7,6 +7,14 @@ RED = "\033[31m"
 RESET = "\033[0m"
 PINK = "\033[38;5;205m"  
 
+#   ------------ Format Numbers -------------------
+
+def format_num(value):
+    if isinstance(value, (int, float)):
+        return f"{value:.2f}"
+    else:
+        return str(value)
+
 #   ----------- Bash options ----------------------
 
 def clear_bash() -> None:
@@ -58,9 +66,9 @@ def check_operation_type(choice: int) -> str:
             case 4:
                 return "/"
 
-def show_result(operation: str, x: float, y: float, result: float) -> None:
+def show_result(operation: str, x: float, y: float, result: float | str) -> None:
         print("------------------")
-        print(f"{x} {operation} {y} = {result}")
+        print(f"{format_num(x)} {operation} {format_num(y)} = {format_num(result)}")
         print("------------------")
 
 
@@ -113,7 +121,7 @@ def menu_geometry(shape) -> None:
 
                     match check_ans(4):
                         case 1:
-                            print(f"The perimeter of the triangle is: {triangle.perimeter()}")
+                            print(f"The perimeter of the triangle is: {format_num(triangle.perimeter())}")
                         case 2:
                             if triangle.check_right_triangle():
                                 print("The triangle is right-angled!")
@@ -121,16 +129,16 @@ def menu_geometry(shape) -> None:
                                 print("The triangle is not right-angled!")
 
                         case 3:
-                            print(f"\nCoresponding base:\n[1] - AB = {triangle.side1}\n[2] - BC = {triangle.side2}\n[3] - AC = {triangle.side3}")
+                            print(f"\nCoresponding base:\n[1] - AB = {format_num(triangle.side1)}\n[2] - BC = {format_num(triangle.side2)}\n[3] - AC = {format_num(triangle.side3)}")
                             match check_ans(3):
                                 case 1:
-                                    print(f"The height for base = {triangle.side1} is {triangle.calc_height(triangle.side1)}")
+                                    print(f"The height for base = {format_num(triangle.side1)} is {format_num(triangle.calc_height(triangle.side1))}")
                                 case 2:
-                                    print(f"The height for base = {triangle.side2} is {triangle.calc_height(triangle.side2)}")
+                                    print(f"The height for base = {format_num(triangle.side2)} is {format_num(triangle.calc_height(triangle.side2))}")
                                 case 3:
-                                    print(f"The height for base = {triangle.side3} is {triangle.calc_height(triangle.side3)}")
+                                    print(f"The height for base = {format_num(triangle.side3)} is {format_num(triangle.calc_height(triangle.side3))}")
                         case 4:
-                            print(f"The area of the triangle is: {triangle.area()}")
+                            print(f"The area of the triangle is: {format_num(triangle.area())}")
 
                     if not continue_or_exit():
                         return
@@ -152,7 +160,7 @@ def show_menu() -> bool:
                         algebra = get_numbers()
                         while True:
                             calculus_sign = menu_algebra()
-                            show_result(check_operation_type(calculus_sign), algebra.number_1, algebra.number_2, algebra.check_choice(calculus_sign))
+                            show_result(check_operation_type(calculus_sign), algebra.number_1, algebra.number_2, algebra.basic_operations(calculus_sign))
 
                             if not continue_or_exit():
                                 return False
