@@ -1,209 +1,234 @@
 from fractions import Fraction
 import os
-from calculator.math_core import Algebra
-from calculator import geometry_core
+from dataclasses import dataclass
+from typing import Sequence
+
+from calculator.geometry_core import Triangle, is_valid_triangle
+from calculator.math_core import AlgebraCalculator, BinaryOperation, DEFAULT_OPERATIONS
 
 RED = "\033[31m"
 RESET = "\033[0m"
-PINK = "\033[38;5;205m"  
+PINK = "\033[38;5;205m"
 
-#   ------------ Format Numbers -------------------
 
-def format_num(value):
+def format_num(value: float | str) -> str:
     if isinstance(value, (int, float)):
         return f"{value:.2f}"
-    else:
-        return str(value)
-
-#   ----------- Bash options ----------------------
-
-def clear_bash() -> None:
-    os.system("cls" if os.name == "nt" else "clear")
+    return str(value)
 
 
-#   ------------- Algebra -------------------------
+@dataclass
+class ConsoleIO:
+    def clear(self) -> None:
+        os.system("cls" if os.name == "nt" else "clear")
 
-def get_numbers() -> Algebra:
-    while True:
-        clear_bash()
-        try:
-            a = float(Fraction(input("First number = ")))
-            b = float(Fraction(input("Second number = ")))
+    def write(self, message: str) -> None:
+        print(message)
 
-            return Algebra(a, b)       
-        except Exception as err:
-            print(RED + "!!! PLEASE ENTER NUMBERS !!!" + RESET)
-            print(f"Error type : {err}")
-            input("\nPress Enter to continue...")
+    def read(self, prompt: str) -> str:
+        return input(prompt)
 
-def menu_algebra() -> int:
-        clear_bash()
-        print("========================")
-        print("[1] - ADD")
-        print("[2] - SUB")
-        print("[3] - MULTIPLY")
-        print("[4] - DIVIDE")
-        print("========================")
-
-        return check_ans(4)   
-    
-def show_menu_algebra() -> int:
-        clear_bash()
-        print("========================")
-        print("[1] - Basic Operations")
-        print("========================")
-
-        return check_ans(1)
-
-def check_operation_type(choice: int) -> str:
-        match choice:
-            case 1:
-                return "+"
-            case 2:
-                return "-"
-            case 3:
-                return "*"
-            case 4:
-                return "/"
-
-def show_result(operation: str, x: float, y: float, result: float | str) -> None:
-        print("------------------")
-        print(f"{format_num(x)} {operation} {format_num(y)} = {format_num(result)}")
-        print("------------------")
+    def pause(self) -> None:
+        input("\nPress Enter to continue...")
 
 
-# ---------------- Geometry --------------------------
+class InputParser:
+    def __init__(self, io: ConsoleIO) -> None:
+        self._io = io
 
-def check_ans_shape(choice: int) -> geometry_core.Triangle:
-        match choice:
-            # triangle
-            case 1:
-                while True:
-                    clear_bash()
-                    try:
-                        a = float(Fraction(input("First side = ")))
-                        b = float(Fraction(input("Second side = ")))
-                        c = float(Fraction(input("Third side = ")))
+    def read_float(self, prompt: str) -> float:
+        while True:
+            self._io.clear()
+            try:
+                return float(Fraction(self._io.read(prompt)))
+            except Exception as err:
+                self._io.write(RED + "!!! PLEASE ENTER NUMBERS !!!" + RESET)
+                self._io.write(f"Error type : {err}")
+                self._io.pause()
 
-                        if a + b <= c or a + c <= b or b + c <= a:
-                            print(RED + "The sides do not form a valid triangle" + RESET)
-                            input("\nPress Enter to continue...")
-                            continue
+    def read_int_in_range(self, prompt: str, minimum: int, maximum: int) -> int:
+        while True:
+            try:
+                answer = int(self._io.read(prompt))
+                if minimum <= answer <= maximum:
+                    return answer
+                options = ", ".join(str(i) for i in range(minimum, maximum + 1))
+                self._io.write(
+                    RED
+                    + "!!! CHOOSE FROM THE NUMBERS DISPLAYED "
+                    + PINK
+                    + f"({options})"
+                    + RED
+                    + " !!!"
+                    + RESET
+                )
+                self._io.pause()
+            except Exception as err:
+                self._io.write(RED + "!!! PLEASE ONLY NATURAL NUMBERS !!!" + RESET)
+                self._io.write(f"Error type : {err}")
+                self._io.pause()
 
-                        return geometry_core.Triangle(a, b, c)
-                    except Exception as err:
-                        print(RED + "!!! PLEASE ENTER NUMBERS !!!" + RESET)
-                        print(f"Error type : {err}")
-                        input("\nPress Enter to continue...")
-
-def show_menu_geometry():
-        clear_bash()
-        print("========================")
-        print("[1] - Triangle")
-        print("========================")
-
-        return check_ans_shape(check_ans(1))
-
-def menu_geometry(shape) -> None:
-        clear_bash()
-        match shape:
-            # ============ TRIUNGHI =====================
-            case geometry_core.Triangle() as triangle:
-
-                while True:
-                    clear_bash()
-                    print("========================")
-                    print("[1] - Perimeter")
-                    print("[2] - Check if it's a right triangle")
-                    print("[3] - Calculate height")
-                    print("[4] - Area")
-                    print("========================")
-
-                    match check_ans(4):
-                        case 1:
-                            print(f"The perimeter of the triangle is: {format_num(triangle.perimeter())}")
-                        case 2:
-                            if triangle.check_right_triangle():
-                                print("The triangle is right-angled!")
-                            else:
-                                print("The triangle is not right-angled!")
-
-                        case 3:
-                            print(f"\nCoresponding base:\n[1] - AB = {format_num(triangle.side1)}\n[2] - BC = {format_num(triangle.side2)}\n[3] - AC = {format_num(triangle.side3)}")
-                            match check_ans(3):
-                                case 1:
-                                    print(f"The height for base = {format_num(triangle.side1)} is {format_num(triangle.calc_height(triangle.side1))}")
-                                case 2:
-                                    print(f"The height for base = {format_num(triangle.side2)} is {format_num(triangle.calc_height(triangle.side2))}")
-                                case 3:
-                                    print(f"The height for base = {format_num(triangle.side3)} is {format_num(triangle.calc_height(triangle.side3))}")
-                        case 4:
-                            print(f"The area of the triangle is: {format_num(triangle.area())}")
-
-                    if not continue_or_exit():
-                        return
-        
-# ============== UI Funcions ====================
-
-def show_menu() -> bool:
-        clear_bash()
-        print("========================")
-        print("[1] - Algebra")
-        print("[2] - Geometry")
-        print("[3] - Exit")
-        print("========================")
-
-        match check_ans(3):
-            case 1:
-                match show_menu_algebra():
-                    case 1:
-                        algebra = get_numbers()
-                        while True:
-                            calculus_sign = menu_algebra()
-                            show_result(check_operation_type(calculus_sign), algebra.number_1, algebra.number_2, algebra.basic_operations(calculus_sign))
-
-                            if not continue_or_exit():
-                                return False
-            case 2:
-                shape = show_menu_geometry()
-                menu_geometry(shape)
-            
-            # Exit Program
-            case 3:
+    def read_yes_no(self, prompt: str) -> bool:
+        while True:
+            answer = self._io.read(prompt).lower()
+            if answer == "n":
+                return False
+            if answer == "y":
                 return True
-
-def check_ans(no_chocices) -> int:   
-    while True: 
-        try:
-            answer = int(input("\nAnswer : "))
-            if answer >= 1 and answer <= no_chocices:
-                return answer
-            else:
-                options = ", ".join(str(i) for i in range(1, no_chocices + 1))
-                print(RED + f"!!! CHOOSE FROM THE NUMBERS DISPLAYED " + PINK + f"({options})" + RED + " !!!" + RESET)
-                input("\nPress Enter to continue...")
-        except Exception as err:
-            print(RED + "!!! PLEASE ONLY NATURAL NUMBERS !!!" + RESET)
-            print(f"Error type : {err}")
-            input("\nPress Enter to continue...")
+            self._io.clear()
+            self._io.write(
+                RED
+                + '!!! I AM NOT LEAVING THIS FUNCTION UNTIL I GET A CLEAR RESPONSE AS IN "Y" or "N" !!!'
+                + RESET
+            )
 
 
+class AlgebraUI:
+    def __init__(
+        self,
+        io: ConsoleIO,
+        parser: InputParser,
+        calculator: AlgebraCalculator,
+    ) -> None:
+        self._io = io
+        self._parser = parser
+        self._calculator = calculator
 
-def continue_or_exit() -> bool:
-    while True:
-        answer = input("\nContinue? [Y / N]: ").lower()
+    def _show_menu(self, operations: Sequence[BinaryOperation]) -> int:
+        self._io.clear()
+        self._io.write("========================")
+        for index, operation in enumerate(operations, start=1):
+            self._io.write(f"[{index}] - {operation.name.upper()}")
+        self._io.write("========================")
+        return self._parser.read_int_in_range("\nAnswer : ", 1, len(operations))
 
-        if answer == "n":
-            return False
-        
-        if answer == "y":
-            return True
+    def run(self) -> None:
+        number_1 = self._parser.read_float("First number = ")
+        number_2 = self._parser.read_float("Second number = ")
+        operations = self._calculator.operations()
 
-        clear_bash()
-        print(RED + "!!! I AM NOT LEAVING THIS FUNCTION UNTIL I GET A CLEAR RESPONSE AS IN \"Y\" or \"N\" !!!" + RESET)
+        while True:
+            choice = self._show_menu(operations)
+            operation = operations[choice - 1]
+            result = self._calculator.compute(choice, number_1, number_2)
+            self._io.write("------------------")
+            self._io.write(
+                f"{format_num(number_1)} {operation.symbol} {format_num(number_2)} = {format_num(result)}"
+            )
+            self._io.write("------------------")
+
+            if not self._parser.read_yes_no("\nContinue? [Y / N]: "):
+                return
+
+
+class GeometryUI:
+    def __init__(self, io: ConsoleIO, parser: InputParser) -> None:
+        self._io = io
+        self._parser = parser
+
+    def _read_triangle(self) -> Triangle:
+        while True:
+            side1 = self._parser.read_float("First side = ")
+            side2 = self._parser.read_float("Second side = ")
+            side3 = self._parser.read_float("Third side = ")
+            if not is_valid_triangle(side1, side2, side3):
+                self._io.write(RED + "The sides do not form a valid triangle" + RESET)
+                self._io.pause()
+                continue
+            return Triangle(side1, side2, side3)
+
+    def run(self) -> None:
+        triangle = self._read_triangle()
+        while True:
+            self._io.clear()
+            self._io.write("========================")
+            self._io.write("[1] - Perimeter")
+            self._io.write("[2] - Check if it's a right triangle")
+            self._io.write("[3] - Calculate height")
+            self._io.write("[4] - Area")
+            self._io.write("========================")
+
+            match self._parser.read_int_in_range("\nAnswer : ", 1, 4):
+                case 1:
+                    self._io.write(
+                        f"The perimeter of the triangle is: {format_num(triangle.perimeter())}"
+                    )
+                case 2:
+                    if triangle.check_right_triangle():
+                        self._io.write("The triangle is right-angled!")
+                    else:
+                        self._io.write("The triangle is not right-angled!")
+                case 3:
+                    self._io.write(
+                        "\nCoresponding base:\n"
+                        f"[1] - AB = {format_num(triangle.side1)}\n"
+                        f"[2] - BC = {format_num(triangle.side2)}\n"
+                        f"[3] - AC = {format_num(triangle.side3)}"
+                    )
+                    match self._parser.read_int_in_range("\nAnswer : ", 1, 3):
+                        case 1:
+                            self._io.write(
+                                f"The height for base = {format_num(triangle.side1)} is {format_num(triangle.calc_height(triangle.side1))}"
+                            )
+                        case 2:
+                            self._io.write(
+                                f"The height for base = {format_num(triangle.side2)} is {format_num(triangle.calc_height(triangle.side2))}"
+                            )
+                        case 3:
+                            self._io.write(
+                                f"The height for base = {format_num(triangle.side3)} is {format_num(triangle.calc_height(triangle.side3))}"
+                            )
+                case 4:
+                    self._io.write(
+                        f"The area of the triangle is: {format_num(triangle.area())}"
+                    )
+
+            if not self._parser.read_yes_no("\nContinue? [Y / N]: "):
+                return
+
+
+class CalculatorApp:
+    def __init__(self) -> None:
+        self._io = ConsoleIO()
+        self._parser = InputParser(self._io)
+        self._algebra = AlgebraUI(
+            self._io,
+            self._parser,
+            AlgebraCalculator(DEFAULT_OPERATIONS),
+        )
+        self._geometry = GeometryUI(self._io, self._parser)
+
+    def run(self) -> None:
+        while True:
+            self._io.clear()
+            self._io.write("========================")
+            self._io.write("[1] - Algebra")
+            self._io.write("[2] - Geometry")
+            self._io.write("[3] - Exit")
+            self._io.write("========================")
+
+            match self._parser.read_int_in_range("\nAnswer : ", 1, 3):
+                case 1:
+                    self._io.clear()
+                    self._io.write("========================")
+                    self._io.write("[1] - Basic Operations")
+                    self._io.write("========================")
+                    self._parser.read_int_in_range("\nAnswer : ", 1, 1)
+                    self._algebra.run()
+                case 2:
+                    self._io.clear()
+                    self._io.write("========================")
+                    self._io.write("[1] - Triangle")
+                    self._io.write("========================")
+                    self._parser.read_int_in_range("\nAnswer : ", 1, 1)
+                    self._geometry.run()
+                case 3:
+                    return
+
 
 def run() -> None:
-    while True:
-        if show_menu():
-            return
+    CalculatorApp().run()
 
+
+if __name__ == "__main__":
+    run()
